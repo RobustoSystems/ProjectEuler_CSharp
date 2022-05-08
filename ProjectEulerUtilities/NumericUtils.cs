@@ -201,7 +201,51 @@ namespace ProjectEulerUtilities
                 }
             }
         }
-        
+
+        public static bool IsPalindrome(ulong number)
+        {
+            bool isPalindrome = false;
+
+            string numberAsString = number.ToString();
+            int stringLength = numberAsString.Length;
+            if (stringLength == 1)
+            {
+                // A string with one character is a palindrome.
+                isPalindrome = true;
+            }
+            else
+            {
+                while (true)
+                {
+                    stringLength = numberAsString.Length;
+                    if (numberAsString[0] == numberAsString[stringLength - 1])
+                    {
+                        if (stringLength <= 2)
+                        {
+                            // The number is a palindrome
+                            isPalindrome = true;
+                            break;
+                        }
+                        else
+                        {
+                            // The first and last characters are the same. This string has a chance of being a palindrome, but more testing is needed.
+                            // Remove the first and last characters and repeat
+                            numberAsString = numberAsString.Remove(0, 1);
+                            stringLength = numberAsString.Length;
+                            numberAsString = numberAsString.Remove(stringLength - 1, 1);
+                        }
+                    }
+                    else
+                    {
+                        // The first and last characters are not the same. This string is not a palindrome. 
+                        isPalindrome = false;
+                        break;
+                    }
+                }
+            }
+            return isPalindrome;
+        }
+
         #endregion // end of Public Methods
 
         #region Private Methods
