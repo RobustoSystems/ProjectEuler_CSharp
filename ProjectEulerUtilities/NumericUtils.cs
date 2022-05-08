@@ -246,6 +246,124 @@ namespace ProjectEulerUtilities
             return isPalindrome;
         }
 
+        public static ulong GetLeastCommonMultiple(ulong x, ulong y)
+        {
+            ulong lcm = 0; // lcm = Least Common Multiple
+
+            List<FactorStruct> lcmPrimeFactorsList = new List<FactorStruct>();
+            List<FactorStruct> primeFactorsX = GetPrimeFactors(x);
+            List<FactorStruct> primeFactorsY = GetPrimeFactors(y);
+
+            // Keep common factors at the highest power
+
+            foreach (FactorStruct primeFactorX in primeFactorsX)
+            {
+                (bool isCommonFactor, int listIndex) = SearchFactorsList(primeFactorsY, primeFactorX.Factor);
+                if (isCommonFactor)
+                {
+                    FactorStruct primeFactorY = primeFactorsY[listIndex];
+                    ulong highestPower = 0;
+                    if (primeFactorX.Power > primeFactorY.Power)
+                    {
+                        highestPower = primeFactorX.Power;
+                    }
+                    else
+                    {
+                        highestPower = primeFactorY.Power;
+                    }
+                    primeFactorsY.RemoveAt(listIndex); // remove the common factor from the y prime factors list
+                    lcmPrimeFactorsList.Add(new FactorStruct(primeFactorX.Factor, highestPower)); // add the common factor at the highest power
+                }
+                else
+                {
+                    // This factor is a factor of X only. Not a factor of Y.
+                    lcmPrimeFactorsList.Add(primeFactorX);
+                }
+            }
+
+            if (primeFactorsY.Count > 0)
+            {
+                // There are some factors of Y-only. That are not factors of X.
+                lcmPrimeFactorsList.AddRange(primeFactorsY);
+            }
+
+            //PrintFactors(lcmPrimeFactorsList); // debug
+
+            lcm = 1;
+            foreach (FactorStruct lcmPrimeFactor in lcmPrimeFactorsList)
+            {
+                lcm *= (ulong)Math.Pow(lcmPrimeFactor.Factor,lcmPrimeFactor.Power);
+            }
+
+            return lcm;
+        }
+
+        public static ulong GetLeastCommonMultipleListInput(List<ulong> inputIntegers)
+        {
+            ulong lcm = 0; // lcm = Least Common Multiple
+
+            if (inputIntegers.Count > 0)
+            {
+                // Integers that are 1 obviously don't affect the LCM, so remove any 1's to begin with
+                inputIntegers.RemoveAll(a => a.Equals(1));
+
+                if (inputIntegers.Count == 0)
+                {
+                    // Corner case: All input integers were equal to 1
+                    lcm = 1;
+                }
+                else if (inputIntegers.Count == 1)
+                {
+                    // Corner case: One element left that is different than 1
+                    lcm = inputIntegers[0];
+                }
+                else
+                {
+                    // Main case: Two or more element left that are different than 1
+                    List<FactorStruct> lcmPrimeFactorsList = new List<FactorStruct>();
+
+                    int loopIteration = 0;
+                    foreach (ulong inputInteger in inputIntegers)
+                    {
+                        List<FactorStruct> inputIntegerPrimeFactors = GetPrimeFactors(inputInteger);
+                        if (loopIteration == 0)
+                        {
+                            // First iteration. Initialise the Factor - Power list of LCM with the Factor-Power list of the first input integer
+                            lcmPrimeFactorsList = inputIntegerPrimeFactors;
+                        }
+                        else
+                        {
+                            // All other iterations
+                            foreach (FactorStruct inputIntegerPrimeFactor in inputIntegerPrimeFactors)
+                            {
+                                (bool isFactorAlreadyInLcmList, int listIndex) = SearchFactorsList(lcmPrimeFactorsList, inputIntegerPrimeFactor.Factor);
+                                if (isFactorAlreadyInLcmList)
+                                {
+                                    // The factor was already listed in the LCM list. Need to check whether the Power needs to be updated.
+                                    if (inputIntegerPrimeFactor.Power > lcmPrimeFactorsList[listIndex].Power)
+                                    {
+                                        lcmPrimeFactorsList[listIndex] = new FactorStruct(lcmPrimeFactorsList[listIndex].Factor, inputIntegerPrimeFactor.Power); // update the power (to a larger power value)
+                                    }
+                                }
+                                else
+                                {
+                                    // This factor is not found in the LCM prime factors list yet. Add it to the list.
+                                    lcmPrimeFactorsList.Add(inputIntegerPrimeFactor);
+                                }
+                            }
+                        }
+                        loopIteration++;
+                    }
+
+                    lcm = 1;
+                    foreach (FactorStruct lcmPrimeFactor in lcmPrimeFactorsList)
+                    {
+                        lcm *= (ulong)Math.Pow(lcmPrimeFactor.Factor, lcmPrimeFactor.Power);
+                    }
+                }
+            }
+            return lcm;
+        }
         #endregion // end of Public Methods
 
         #region Private Methods
@@ -272,7 +390,6 @@ namespace ProjectEulerUtilities
             return (isExistingFactor, listIndex);
         }
         #endregion // end of Private Methods
-
     }
 
     public struct FactorStruct
