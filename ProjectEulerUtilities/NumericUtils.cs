@@ -92,7 +92,7 @@ namespace ProjectEulerUtilities
                 bool hasNumberBeenReducedToAPrime = false;
                 while (hasNumberBeenReducedToAPrime == false)
                 {
-                    (bool isPrime, ulong firstFactor) = IsPrimeVersion1(numberUnderTest);
+                    (bool isPrime, ulong firstFactor) = IsPrime(numberUnderTest);
                     (bool isExistingFactor, int listIndex) = SearchFactorsList(primeFactors, firstFactor);
                     if (isExistingFactor)
                     {
@@ -121,7 +121,7 @@ namespace ProjectEulerUtilities
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static (bool, ulong) IsPrimeVersion1(ulong x)
+        public static (bool, ulong) IsPrime(ulong x)
         {
             bool isPrime = false;
             ulong smallestFactor = 0;
